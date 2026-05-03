@@ -1,0 +1,58 @@
+# Chương trình mô phỏng lập lịch FCFS cho giao dịch Ngân hàng
+
+class Transaction:
+    def __init__(self, id, arrival, burst):
+        self.id = id
+        self.arrival = arrival
+        self.burst = burst
+        self.start_time = 0
+        self.finish_time = 0
+        self.waiting_time = 0
+        self.turnaround_time = 0
+
+def simulate_fcfs(transactions):
+    # Sắp xếp giao dịch theo thời điểm đến (đảm bảo tính FIFO)
+    transactions.sort(key=lambda x: x.arrival)
+    
+    current_time = 0
+    total_wt = 0
+    total_tat = 0
+    
+    print("\n--- Tiễn trình xử lý FCFS ---")
+    print(f"{'GiaoDịch':<10}|{'Arrival':<8}|{'Burst':<6}|{'Start':<6}|{'Finish':<8}|{'WT':<5}|{'TAT':<5}")
+    print("-" * 65)
+    
+    for t in transactions:
+        # Nếu server đang nhàn rỗi, nhảy đến thời điểm giao dịch đến
+        if current_time < t.arrival:
+            current_time = t.arrival
+            
+        t.start_time = current_time
+        t.finish_time = t.start_time + t.burst
+        t.turnaround_time = t.finish_time - t.arrival
+        t.waiting_time = t.turnaround_time - t.burst
+        
+        total_wt += t.waiting_time
+        total_tat += t.turnaround_time
+        
+        # Cập nhật thời gian hệ thống sau khi xử lý xong
+        current_time = t.finish_time
+        
+        print(f"{t.id:<10}|{t.arrival:<8}|{t.burst:<6}|{t.start_time:<6}|{t.finish_time:<8}|{t.waiting_time:<5}|{t.turnaround_time:<5}")
+
+    n = len(transactions)
+    print("-" * 65)
+    print(f"Thời gian chờ trung bình (AVG WT): {total_wt/n:.2f} ms")
+    print(f"Thời gian hoàn tất trung bình (AVG TAT): {total_tat/n:.2f} ms\n")
+
+# --- Chạy mô phỏng với dữ liệu Ví dụ minh họa (Phần 4.2) ---
+if __name__ == "__main__":
+    # Khởi tạo danh sách các giao dịch (ID, Arrival, Burst)
+    data = [
+        Transaction("T1-SaoKe", 0, 6),
+        Transaction("T2-ChuyenK", 1, 2),
+        Transaction("T3-XemSD", 2, 1),
+        Transaction("T4-ThanhT", 3, 3)
+    ]
+    
+    simulate_fcfs(data)
